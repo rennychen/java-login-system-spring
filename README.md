@@ -58,6 +58,8 @@ com.github.renny.loginsystem
 
 ---
 
+## How to Run
+
 1. 下載專案  
    https://github.com/rennychen/java-login-system-spring.git
 
@@ -68,6 +70,14 @@ com.github.renny.loginsystem
    java Main
 
 4.依照主控台選單操作（註冊 / 登入 / 修改密碼 / 刪除帳號）
+
+## How to Run (Maven)
+
+```bash
+mvn clean package
+java -jar target/login-system-0.0.1-SNAPSHOT.jar
+
+```
 
 ---
 
