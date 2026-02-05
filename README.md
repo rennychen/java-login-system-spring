@@ -71,9 +71,11 @@ com.github.renny.loginsystem
 
 ---
 
-## 使用技術
+## Tech Stack
 
-
+- Java
+- Spring Boot
+- Maven
 
 
 
