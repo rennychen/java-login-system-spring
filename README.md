@@ -1,4 +1,4 @@
-# Java Login System
+# Java Login System with Spring Boot
 
 使用 Java 撰寫的主控台使用者登入系統
 
