@@ -1,6 +1,6 @@
 # Java Login System with Spring Boot
 
-使用 Java 撰寫的主控台使用者登入系統
+本專案是一個使用 Spring Boot 和 Maven 建置的登入系統
 
 ## Introduction
 
