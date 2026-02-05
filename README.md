@@ -59,7 +59,7 @@ com.github.renny.loginsystem
 ---
 
 1. 下載專案  
-   
+   https://github.com/rennychen/java-login-system-spring.git
 
 2. 編譯程式
    javac src/Main.java
