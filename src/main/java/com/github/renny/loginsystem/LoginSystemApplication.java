@@ -1,4 +1,4 @@
-package com.github.renny.loginsystem.app;
+package com.github.renny.loginsystem;
 
 import com.github.renny.loginsystem.auth.AuthService;
 import com.github.renny.loginsystem.encoder.PasswordEncoder;
