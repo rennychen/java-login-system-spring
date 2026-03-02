@@ -30,9 +30,10 @@
 
 ## Project Structure
 
-com.github.renny.loginsystem    
-├── app    
-│   └── LoginSystemApplication.java    
+com.github.renny.loginsystem  
+├── LoginSystemApplication.java
+├── runner    
+│   └── ConsoleRunner.java    
 ├── user    
 │   └── User.java    
 ├── repository    
