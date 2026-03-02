@@ -1,9 +1,12 @@
 package com.github.renny.loginsystem.encoder;
 
+import org.springframework.stereotype.Component;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
 
+@Component
 public class SHA256PasswordEncoder implements PasswordEncoder{
     @Override
     public String encode(String rawPassword){

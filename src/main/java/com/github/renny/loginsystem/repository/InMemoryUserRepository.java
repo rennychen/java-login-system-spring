@@ -1,10 +1,12 @@
 package com.github.renny.loginsystem.repository;
 
 import com.github.renny.loginsystem.user.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.HashMap;
 
+@Repository
 public class InMemoryUserRepository implements UserRepository{
 
     Map<String, User> data = new HashMap<>();

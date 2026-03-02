@@ -1,5 +1,8 @@
 package com.github.renny.loginsystem.policy;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class DefaultPasswordPolicy implements PasswordPolicy {
     @Override
     public void validate(String password){

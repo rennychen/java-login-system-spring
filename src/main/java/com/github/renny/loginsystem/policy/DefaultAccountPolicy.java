@@ -1,7 +1,9 @@
 package com.github.renny.loginsystem.policy;
 
 import com.github.renny.loginsystem.expection.InvalidAccountException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DefaultAccountPolicy implements AccountPolicy{
     @Override
     public void validate(String account) {

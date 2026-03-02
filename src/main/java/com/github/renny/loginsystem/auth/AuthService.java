@@ -8,7 +8,9 @@ import com.github.renny.loginsystem.policy.AccountPolicy;
 import com.github.renny.loginsystem.policy.PasswordPolicy;
 import com.github.renny.loginsystem.repository.UserRepository;
 import com.github.renny.loginsystem.user.User;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthService {
 
     private final UserRepository userRepository;

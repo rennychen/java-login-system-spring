@@ -1,7 +1,10 @@
 package com.github.renny.loginsystem.session;
 
 import com.github.renny.loginsystem.user.User;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class LoginSession {
     private User currentUser;
 
