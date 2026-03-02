@@ -151,22 +151,15 @@ com.github.renny.loginsystem
 
 ## How to Run
 
-1. 下載專案  
-   https://github.com/rennychen/java-login-system-spring.git
+直接在 IDE 執行：
 
-2. 編譯程式
-   javac src/Main.java
-
-3. 執行程式
-   java Main
-
-4.依照主控台選單操作（註冊 / 登入 / 修改密碼 / 刪除帳號）
+LoginSystemApplication.java
 
 ## How to Run (Maven)
 
 ```bash
 mvn clean package
-java -jar target/login-system-0.0.1-SNAPSHOT.jar
+java -jar target/login-system-1.0-SNAPSHOT.jar
 
 ```
 
