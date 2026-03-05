@@ -210,8 +210,8 @@ private final UserRepository userRepository;
 
 
  ## Project Evolution
-
-本專案為系列專案的一部分：
+ 
+此專案以「逐步演進」的方式進行開發，從純 Java 核心邏輯開始，逐步導入 Spring 架構與資料持久化機制，模擬實務專案的演進過程。
 
 1️⃣ 純 Java OOP 版本
 
