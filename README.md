@@ -214,9 +214,14 @@ private final UserRepository userRepository;
 本專案為系列專案的一部分：
 
 1️⃣ 純 Java OOP 版本
+
 2️⃣ Spring Boot DI 版本（目前）
-3️⃣ JSON 持久化版本（進行中）
-4️⃣ Database 版本（規劃中）
+
+3️⃣ JSON 持久化版本（進行中） ->將原本的 InMemory Repository 替換為 JSON 檔案儲存機制。
+
+4️⃣ Database 版本（規劃中）->
+
+5️⃣ Database 版本（規劃中）-> 整合資料庫（如 MySQL），實作正式的資料持久化機制。
 
 
 
