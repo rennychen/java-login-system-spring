@@ -9,27 +9,18 @@
 本專案模擬實務中常見的帳號登入流程，包含：
 
  - 帳號驗證
-
  - 密碼加密（Hash）
-
  - 登入失敗次數限制
-
  - 帳號鎖定機制
-
  - Session 管理
 
 本專案著重於：
 
  - 物件導向設計（OOP）
-
  - 分層架構（Layered Architecture）
-
  - Repository Pattern
-
  - Policy Pattern
-
  - 依賴注入（Dependency Injection）
-
  - 可抽換儲存實作（InMemory → JSON / Database）  **此項尚未完成
 
 此專案展示從「純 Java 核心邏輯」重構為「Spring Boot 架構專案」的完整演進過程。
@@ -69,21 +60,15 @@ InMemoryUserRepository (Current Implementation)
 ConsoleRunner
 
  - 負責主控台互動
-
  - 不處理商業邏輯
-
  - 僅呼叫 Service
 
 2️⃣ Service Layer
 
  - AuthService
-
  - 負責登入流程控制
-
  - 驗證帳號與密碼
-
  - 控制登入失敗與鎖定邏輯
-
  - 不關心資料儲存細節
 
 3️⃣ Repository Layer
@@ -95,13 +80,11 @@ UserRepository（介面）
 InMemoryUserRepository（實作）
 
  - 使用 HashMap 作為記憶體儲存
-
  - 未來可替換為 JSON / Database 實作
 
 4️⃣ Policy Pattern
 
  - PasswordPolicy
-
  - AccountPolicy
 
 將規則抽離為介面，未來可替換實作。
@@ -109,7 +92,6 @@ InMemoryUserRepository（實作）
 5️⃣ Security
 
  - PasswordEncoder
-
  - SHA256PasswordEncoder
 
 密碼以 SHA-256 雜湊儲存，不保存明文。
@@ -210,13 +192,18 @@ private final UserRepository userRepository;
 
 
  ## Project Evolution
-
-本專案為系列專案的一部分：
+ 
+此專案以「逐步演進」的方式進行開發，從純 Java 核心邏輯開始，逐步導入 Spring 架構與資料持久化機制，模擬實務專案的演進過程。
 
 1️⃣ 純 Java OOP 版本
+
 2️⃣ Spring Boot DI 版本（目前）
-3️⃣ JSON 持久化版本（進行中）
-4️⃣ Database 版本（規劃中）
+
+3️⃣ JSON 持久化版本（進行中） -> 將原本的 InMemory Repository 替換為 JSON 檔案儲存機制。
+
+4️⃣ REST API 版本（規劃中）-> 新增 RESTful API，將系統由 Console 應用程式轉換為 Web Backend 服務。
+
+5️⃣ Database 版本（規劃中）-> 整合資料庫（如 MySQL），實作正式的資料持久化機制。
 
 
 
