@@ -21,7 +21,7 @@
  - Repository Pattern
  - Policy Pattern
  - 依賴注入（Dependency Injection）
- - 可抽換儲存實作（InMemory → JSON / Database）  **此項尚未完成
+ - 可抽換儲存實作（InMemory → JSON / Database）
 
 此專案展示從「純 Java 核心邏輯」重構為「Spring Boot 架構專案」的完整演進過程。
 
