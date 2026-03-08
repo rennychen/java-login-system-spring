@@ -21,7 +21,7 @@
  - Repository Pattern
  - Policy Pattern
  - 依賴注入（Dependency Injection）
- - 可抽換儲存實作（InMemory → JSON / Database）  **此項尚未完成
+ - 可抽換儲存實作（InMemory → JSON / Database）
 
 此專案展示從「純 Java 核心邏輯」重構為「Spring Boot 架構專案」的完整演進過程。
 
@@ -30,13 +30,10 @@
 ## Features
 
 - 使用者註冊
-- 使用者登入
+- 使用者登入驗證
 - 密碼 SHA-256 加密
 - 登入失敗次數累計
 - 超過次數自動鎖定帳號
-- 登入成功後重置失敗次數
-- 修改密碼
-- 刪除帳號
 - 自訂例外處理（帳號不存在、密碼錯誤、帳號鎖定）
 
 ---
@@ -108,7 +105,8 @@ com.github.renny.loginsystem
 ├── user    
 │   └── User.java    
 ├── repository    
-│   ├── UserRepository.java    
+│   ├── UserRepository.java
+│   ├── JsonUserRepository.java
 │   └── InMemoryUserRepository.java    
 ├── auth    
 │   └── AuthService.java    
@@ -197,11 +195,11 @@ private final UserRepository userRepository;
 
 1️⃣ 純 Java OOP 版本
 
-2️⃣ Spring Boot DI 版本（目前）
+2️⃣ Spring Boot DI 版本
 
-3️⃣ JSON 持久化版本（進行中） -> 將原本的 InMemory Repository 替換為 JSON 檔案儲存機制。
+3️⃣ JSON 持久化版本（目前）
 
-4️⃣ REST API 版本（規劃中）-> 新增 RESTful API，將系統由 Console 應用程式轉換為 Web Backend 服務。
+4️⃣ REST API 版本（進行中）-> 新增 RESTful API，將系統由 Console 應用程式轉換為 Web Backend 服務。
 
 5️⃣ Database 版本（規劃中）-> 整合資料庫（如 MySQL），實作正式的資料持久化機制。
 
