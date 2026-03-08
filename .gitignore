@@ -44,3 +44,6 @@ build/
 
 # Maven 編譯產物
 target/
+
+#Jackson
+*.json

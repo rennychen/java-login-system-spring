@@ -8,6 +8,7 @@ import com.github.renny.loginsystem.policy.AccountPolicy;
 import com.github.renny.loginsystem.policy.PasswordPolicy;
 import com.github.renny.loginsystem.repository.UserRepository;
 import com.github.renny.loginsystem.user.User;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +19,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AccountPolicy accountPolicy;
 
-    public AuthService(UserRepository userRepository,PasswordPolicy passwordPolicy,PasswordEncoder passwordEncoder,AccountPolicy accountPolicy) {
+    public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository, PasswordPolicy passwordPolicy, PasswordEncoder passwordEncoder, AccountPolicy accountPolicy) {
         this.userRepository = userRepository;
         this.passwordPolicy = passwordPolicy;
         this.passwordEncoder = passwordEncoder;
