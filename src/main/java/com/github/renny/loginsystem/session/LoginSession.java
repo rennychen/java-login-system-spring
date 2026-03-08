@@ -21,9 +21,6 @@ public class LoginSession {
     }
 
     public User getCurrentUser(){
-        if(!isLoggedIn()){
-            throw new IllegalStateException("尚未登入");
-        }
         return currentUser;
     }
 }

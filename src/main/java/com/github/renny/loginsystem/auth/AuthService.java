@@ -3,10 +3,12 @@ package com.github.renny.loginsystem.auth;
 import com.github.renny.loginsystem.encoder.PasswordEncoder;
 import com.github.renny.loginsystem.expection.AccountLockedException;
 import com.github.renny.loginsystem.expection.AccountNotFoundException;
+import com.github.renny.loginsystem.expection.InvalidAccountException;
 import com.github.renny.loginsystem.expection.PasswordMismatchException;
 import com.github.renny.loginsystem.policy.AccountPolicy;
 import com.github.renny.loginsystem.policy.PasswordPolicy;
 import com.github.renny.loginsystem.repository.UserRepository;
+import com.github.renny.loginsystem.session.LoginSession;
 import com.github.renny.loginsystem.user.User;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,14 @@ public class AuthService {
     private final PasswordPolicy passwordPolicy;
     private final PasswordEncoder passwordEncoder;
     private final AccountPolicy accountPolicy;
+    private final LoginSession loginSession;
 
-    public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository, PasswordPolicy passwordPolicy, PasswordEncoder passwordEncoder, AccountPolicy accountPolicy) {
+    public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository, PasswordPolicy passwordPolicy, PasswordEncoder passwordEncoder, AccountPolicy accountPolicy,LoginSession loginSession) {
         this.userRepository = userRepository;
         this.passwordPolicy = passwordPolicy;
         this.passwordEncoder = passwordEncoder;
         this.accountPolicy = accountPolicy;
+        this.loginSession = loginSession;
     }
 
     public void register(String account, String userName, String password) {
@@ -66,7 +70,35 @@ public class AuthService {
             throw new PasswordMismatchException("密碼錯誤!");
         }
 
+        loginSession.login(user);
         user.resetFailedLoginAttempts();
         return user;
+    }
+
+    public void logout(){
+        if(!loginSession.isLoggedIn()){
+            throw new InvalidAccountException("尚未登入。");
+        }
+        loginSession.logout();
+    }
+
+    public String showCurrentUser(){
+        if(!loginSession.isLoggedIn()){
+            throw new IllegalStateException("尚未登入!");
+        }
+        return loginSession.getCurrentUser().getUserName();
+
+    }
+
+    public boolean deleteUserAccount(){
+        if(!loginSession.isLoggedIn()){
+            throw new IllegalStateException("尚未登入!");
+        }
+
+        String account = loginSession.getCurrentUser().getUserAccount();
+        boolean result = userRepository.deleteByAccount(account);
+        loginSession.logout();
+        return result;
+
     }
 }
