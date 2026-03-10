@@ -101,4 +101,24 @@ public class AuthService {
         return result;
 
     }
+
+    public void changePassword(String oldPassword,String newPassword,String newPassword2){
+
+        User user = loginSession.getCurrentUser();
+        String oldPasswordHash = passwordEncoder.encode(oldPassword);
+        if(!oldPasswordHash.equals(user.getPasswordHash())){
+            throw new PasswordMismatchException("原始密碼輸入不符!");
+        }
+
+        if(!newPassword.equals(newPassword2)){
+            throw new PasswordMismatchException("輸入新密碼不相同!");
+        }
+
+        checkPasswordPolicyCorrect(newPassword); //確認密碼設置是否符合規範
+        String newPasswordHash = passwordEncoder.encode(newPassword); //密碼改成Hash
+        user.setPasswordHash(newPasswordHash);
+        userRepository.save(user);
+        loginSession.logout();
+
+    }
 }

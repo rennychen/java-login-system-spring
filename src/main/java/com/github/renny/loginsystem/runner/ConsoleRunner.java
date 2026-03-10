@@ -32,6 +32,7 @@ public class ConsoleRunner implements CommandLineRunner {
             System.out.println("3->顯示目前登入身分");
             System.out.println("4->登出");
             System.out.println("5->刪除帳號");
+            System.out.println("6->更改密碼");
             System.out.println("0->結束使用");
             System.out.print("選擇使用功能:");
 
@@ -51,6 +52,9 @@ public class ConsoleRunner implements CommandLineRunner {
                     break;
                 case "5":
                     deleteUserAccount(scan);
+                    break;
+                case "6":
+                    setUserPassword(scan);
                     break;
                 case "0":
                     System.out.println("謝謝使用本系統。");
@@ -146,6 +150,28 @@ public class ConsoleRunner implements CommandLineRunner {
             }
         }catch (IllegalStateException e){
             System.out.println("錯誤," + e.getMessage());
+        }
+    }
+
+    //改密碼
+    private void setUserPassword(Scanner scan){
+
+        try{
+            String userName = authService.showCurrentUser();
+            System.out.println(userName + "您好,目前使用功能為更改密碼。");
+            System.out.print("請輸入舊密碼:");
+            String oldPassword = scan.nextLine();
+            System.out.print("請輸入新密碼:");
+            String newPassword = scan.nextLine();
+            System.out.print("再次確認新密碼:");
+            String newPassword2 = scan.nextLine();
+            authService.changePassword(oldPassword,newPassword,newPassword2);
+
+            System.out.println("更改密碼完成!請用新密碼重新登入");
+
+
+        }catch(RuntimeException e){
+            System.out.println("錯誤!" + e.getMessage());
         }
     }
 
