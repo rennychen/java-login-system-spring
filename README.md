@@ -190,6 +190,12 @@ private final UserRepository userRepository;
 | Encoder      | 加密邏輯 |
 
 
+ ## Branch
+
+- main → Console (CommandLineRunner) version
+
+- feature/rest-api → REST API refactoring in progress
+ 
  ## Project Evolution
  
 此專案以「逐步演進」的方式進行開發，從純 Java 核心邏輯開始，逐步導入 Spring 架構與資料持久化機制，模擬實務專案的演進過程。
