@@ -41,10 +41,10 @@ public class AuthController {
         try{
             authService.register(request.getAccount(),request.getUserName(),request.getPassword());
             RegisterResponse successData = new RegisterResponse(true,"註冊成功");
-            return ResponseEntity.ok(successData);
+            return ResponseEntity.status(HttpStatus.CREATED).body(successData);
         } catch (RuntimeException e) {
             RegisterResponse errorData = new RegisterResponse(false,"註冊失敗," + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
+            return ResponseEntity.badRequest().body(errorData);
         }
 
     }
@@ -91,13 +91,8 @@ public class AuthController {
     @DeleteMapping("account")
     public ResponseEntity<DeleteAccountResponse> deleteUserAccount(){
         try{
-            if(authService.deleteUserAccount()){
-                DeleteAccountResponse successData = new DeleteAccountResponse(true,"刪除帳號成功!");
-                return ResponseEntity.ok(successData);
-            }
-            //用戶取消刪除帳號
-            DeleteAccountResponse errorData = new DeleteAccountResponse(false,"取消刪除");
-            return ResponseEntity.ok(errorData);
+            DeleteAccountResponse successData = new DeleteAccountResponse(true,"刪除帳號成功!");
+            return ResponseEntity.ok(successData);
         }catch (IllegalStateException e){
             DeleteAccountResponse errorData = new DeleteAccountResponse(false,"錯誤," + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
