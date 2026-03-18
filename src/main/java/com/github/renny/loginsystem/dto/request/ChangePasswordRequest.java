@@ -1,6 +1,6 @@
 package com.github.renny.loginsystem.dto.request;
 
-public class PasswordChangeRequest {
+public class ChangePasswordRequest {
     private String oldPassword;
     private String newPassword;
     private String newPassword2;
