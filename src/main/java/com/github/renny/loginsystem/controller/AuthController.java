@@ -4,12 +4,9 @@ import com.github.renny.loginsystem.auth.AuthService;
 import com.github.renny.loginsystem.dto.request.LoginRequest;
 import com.github.renny.loginsystem.dto.request.ChangePasswordRequest;
 import com.github.renny.loginsystem.dto.request.RegisterRequest;
-import com.github.renny.loginsystem.dto.response.ChangePasswordResponse;
+import com.github.renny.loginsystem.dto.response.ApiResponse;
 import com.github.renny.loginsystem.dto.response.CurrentUserResponse;
-import com.github.renny.loginsystem.dto.response.DeleteAccountResponse;
 import com.github.renny.loginsystem.dto.response.LoginResponse;
-import com.github.renny.loginsystem.dto.response.LogoutResponse;
-import com.github.renny.loginsystem.dto.response.RegisterResponse;
 import com.github.renny.loginsystem.expection.AccountLockedException;
 import com.github.renny.loginsystem.expection.AccountNotFoundException;
 import com.github.renny.loginsystem.expection.InvalidAccountException;
@@ -37,78 +34,69 @@ public class AuthController {
 
     //註冊
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request){
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody RegisterRequest request){
         try{
             authService.register(request.getAccount(),request.getUserName(),request.getPassword());
-            RegisterResponse successData = new RegisterResponse(true,"註冊成功");
-            return ResponseEntity.status(HttpStatus.CREATED).body(successData);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("註冊成功",null));
         } catch (RuntimeException e) {
-            RegisterResponse errorData = new RegisterResponse(false,"註冊失敗," + e.getMessage());
-            return ResponseEntity.badRequest().body(errorData);
+            return ResponseEntity.badRequest().body(ApiResponse.error("註冊失敗," + e.getMessage()));
         }
 
     }
 
     //登入
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request){
         try{
             User user = authService.login(request.getAccount(),request.getPassword());
-            LoginResponse successData = new LoginResponse(true,"登入成功!歡迎回來,",user.getUserName());
-            return ResponseEntity.ok(successData);
+            LoginResponse successData = new LoginResponse(user.getUserName());
+            return ResponseEntity.ok(ApiResponse.success("登入成功,歡迎回來",successData));
         }catch (AccountNotFoundException | AccountLockedException | PasswordMismatchException e){
-            LoginResponse errorData = new LoginResponse(false,"錯誤!" + e.getMessage(),null);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤!" + e.getMessage()));
         }
     }
 
     //顯示目前登入身分
     @GetMapping("/current")
-    public ResponseEntity<CurrentUserResponse> showCurrentUser(){
+    public ResponseEntity<ApiResponse<CurrentUserResponse>> showCurrentUser(){
         try{
-            CurrentUserResponse successData = new CurrentUserResponse(true,"目前使用者為" , authService.showCurrentUser());
-            return ResponseEntity.ok(successData);
+            CurrentUserResponse successData = new CurrentUserResponse(authService.showCurrentUser());
+            return ResponseEntity.ok(ApiResponse.success("目前使用者為",successData));
         }catch (IllegalStateException e){
-            CurrentUserResponse errorData = new CurrentUserResponse(false,"錯誤," + e.getMessage(),null);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤!" + e.getMessage()));
         }
     }
 
     //登出
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logout(){
+    public ResponseEntity<ApiResponse<Void>> logout(){
         try{
             authService.logout();
-            LogoutResponse successData = new LogoutResponse(true,"登出成功!");
-            return ResponseEntity.ok(successData);
+            return ResponseEntity.ok(ApiResponse.success("登出成功!",null));
         }catch (InvalidAccountException e){
-            LogoutResponse errorData = new LogoutResponse(false,"錯誤," + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤," + e.getMessage()));
         }
     }
 
     //刪除帳號
     @DeleteMapping("account")
-    public ResponseEntity<DeleteAccountResponse> deleteUserAccount(){
+    public ResponseEntity<ApiResponse<Void>> deleteUserAccount(){
         try{
-            DeleteAccountResponse successData = new DeleteAccountResponse(true,"刪除帳號成功!");
-            return ResponseEntity.ok(successData);
+            authService.deleteUserAccount();
+            return ResponseEntity.ok(ApiResponse.success("刪除帳號成功!",null));
         }catch (IllegalStateException e){
-            DeleteAccountResponse errorData = new DeleteAccountResponse(false,"錯誤," + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorData);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤," + e.getMessage()));
         }
     }
 
     //改密碼
     @PatchMapping("/password")
-    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestBody ChangePasswordRequest request){
+    public ResponseEntity<ApiResponse<Void>> changePassword(@RequestBody ChangePasswordRequest request){
         try{
             authService.changePassword(request.getOldPassword(),request.getNewPassword(),request.getNewPassword2());
-            ChangePasswordResponse successData = new ChangePasswordResponse(true,"更改密碼完成!請用新密碼重新登入");
-            return ResponseEntity.ok(successData);
+            return ResponseEntity.ok(ApiResponse.success("更改密碼完成!請用新密碼重新登入",null));
         }catch(RuntimeException e){
-            ChangePasswordResponse errorData = new ChangePasswordResponse(false,"錯誤!" + e.getMessage());
-            return ResponseEntity.badRequest().body(errorData);
+            return ResponseEntity.badRequest().body(ApiResponse.error("錯誤!" + e.getMessage()));
         }
     }
 }
