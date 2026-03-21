@@ -35,68 +35,43 @@ public class AuthController {
     //註冊
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody RegisterRequest request){
-        try{
-            authService.register(request.getAccount(),request.getUserName(),request.getPassword());
-            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("註冊成功",null));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("註冊失敗," + e.getMessage()));
-        }
-
+        authService.register(request.getAccount(),request.getUserName(),request.getPassword());
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("註冊成功",null));
     }
 
     //登入
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request){
-        try{
-            User user = authService.login(request.getAccount(),request.getPassword());
-            LoginResponse successData = new LoginResponse(user.getUserName());
-            return ResponseEntity.ok(ApiResponse.success("登入成功,歡迎回來",successData));
-        }catch (AccountNotFoundException | AccountLockedException | PasswordMismatchException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤!" + e.getMessage()));
-        }
+        User user = authService.login(request.getAccount(),request.getPassword());
+        LoginResponse successData = new LoginResponse(user.getUserName());
+        return ResponseEntity.ok(ApiResponse.success("登入成功,歡迎回來",successData));
     }
 
     //顯示目前登入身分
     @GetMapping("/current")
     public ResponseEntity<ApiResponse<CurrentUserResponse>> showCurrentUser(){
-        try{
-            CurrentUserResponse successData = new CurrentUserResponse(authService.showCurrentUser());
-            return ResponseEntity.ok(ApiResponse.success("目前使用者為",successData));
-        }catch (IllegalStateException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤!" + e.getMessage()));
-        }
+        CurrentUserResponse successData = new CurrentUserResponse(authService.showCurrentUser());
+        return ResponseEntity.ok(ApiResponse.success("目前使用者為",successData));
     }
 
     //登出
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(){
-        try{
-            authService.logout();
-            return ResponseEntity.ok(ApiResponse.success("登出成功!",null));
-        }catch (InvalidAccountException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤," + e.getMessage()));
-        }
+        authService.logout();
+        return ResponseEntity.ok(ApiResponse.success("登出成功!",null));
     }
 
     //刪除帳號
-    @DeleteMapping("account")
+    @DeleteMapping("/account")
     public ResponseEntity<ApiResponse<Void>> deleteUserAccount(){
-        try{
-            authService.deleteUserAccount();
-            return ResponseEntity.ok(ApiResponse.success("刪除帳號成功!",null));
-        }catch (IllegalStateException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤," + e.getMessage()));
-        }
+        authService.deleteUserAccount();
+        return ResponseEntity.ok(ApiResponse.success("刪除帳號成功!",null));
     }
 
     //改密碼
     @PatchMapping("/password")
     public ResponseEntity<ApiResponse<Void>> changePassword(@RequestBody ChangePasswordRequest request){
-        try{
-            authService.changePassword(request.getOldPassword(),request.getNewPassword(),request.getNewPassword2());
-            return ResponseEntity.ok(ApiResponse.success("更改密碼完成!請用新密碼重新登入",null));
-        }catch(RuntimeException e){
-            return ResponseEntity.badRequest().body(ApiResponse.error("錯誤!" + e.getMessage()));
-        }
+        authService.changePassword(request.getOldPassword(),request.getNewPassword(),request.getNewPassword2());
+        return ResponseEntity.ok(ApiResponse.success("更改密碼完成!請用新密碼重新登入",null));
     }
 }

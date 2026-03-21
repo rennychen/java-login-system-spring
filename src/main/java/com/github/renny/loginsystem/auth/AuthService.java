@@ -67,11 +67,13 @@ public class AuthService {
 
         if(!passwordMatch){ //登入失敗增加登入失敗次數
             user.increaseFailedLoginAttempts();
+            userRepository.save(user);
             throw new PasswordMismatchException("密碼錯誤!");
         }
 
         loginSession.login(user);
         user.resetFailedLoginAttempts();
+        userRepository.save(user);
         return user;
     }
 
