@@ -22,7 +22,11 @@ public class AuthService {
     private final AccountPolicy accountPolicy;
     private final LoginSession loginSession;
 
-    public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository, PasswordPolicy passwordPolicy, PasswordEncoder passwordEncoder, AccountPolicy accountPolicy,LoginSession loginSession) {
+    public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository,
+                       PasswordPolicy passwordPolicy,
+                       @Qualifier("bCryptPasswordEncoderImpl") PasswordEncoder passwordEncoder,
+                       AccountPolicy accountPolicy,
+                       LoginSession loginSession) {
         this.userRepository = userRepository;
         this.passwordPolicy = passwordPolicy;
         this.passwordEncoder = passwordEncoder;
