@@ -24,7 +24,7 @@ public class AuthService {
 
     public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository,
                        PasswordPolicy passwordPolicy,
-                       @Qualifier("bCryptPasswordEncoderImpl") PasswordEncoder passwordEncoder,
+                       @Qualifier("transitioningPasswordEncoderImpl") PasswordEncoder passwordEncoder,
                        AccountPolicy accountPolicy,
                        LoginSession loginSession) {
         this.userRepository = userRepository;
@@ -73,6 +73,12 @@ public class AuthService {
             user.increaseFailedLoginAttempts();
             userRepository.save(user);
             throw new PasswordMismatchException("密碼錯誤!");
+        }
+
+
+        if(passwordEncoder.upgradeEncoding(user.getPasswordHash())){
+            String newHashedPassword = passwordEncoder.encode(password);
+            user.setPasswordHash(newHashedPassword);
         }
 
         loginSession.login(user);
