@@ -1,5 +1,6 @@
 package com.github.renny.loginsystem.auth;
 
+import com.github.renny.loginsystem.dto.response.LoginResponse;
 import com.github.renny.loginsystem.encoder.PasswordEncoder;
 import com.github.renny.loginsystem.expection.AccountLockedException;
 import com.github.renny.loginsystem.expection.AccountNotFoundException;
@@ -8,8 +9,10 @@ import com.github.renny.loginsystem.expection.PasswordMismatchException;
 import com.github.renny.loginsystem.policy.AccountPolicy;
 import com.github.renny.loginsystem.policy.PasswordPolicy;
 import com.github.renny.loginsystem.repository.UserRepository;
+import com.github.renny.loginsystem.security.JwtUtils;
 import com.github.renny.loginsystem.session.LoginSession;
 import com.github.renny.loginsystem.user.User;
+import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -20,17 +23,19 @@ public class AuthService {
     private final PasswordPolicy passwordPolicy;
     private final PasswordEncoder passwordEncoder;
     private final AccountPolicy accountPolicy;
+    private final JwtUtils jwtUtils;
     private final LoginSession loginSession;
 
     public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository,
                        PasswordPolicy passwordPolicy,
                        @Qualifier("transitioningPasswordEncoderImpl") PasswordEncoder passwordEncoder,
                        AccountPolicy accountPolicy,
-                       LoginSession loginSession) {
+                       JwtUtils jwtUtils,LoginSession loginSession) {
         this.userRepository = userRepository;
         this.passwordPolicy = passwordPolicy;
         this.passwordEncoder = passwordEncoder;
         this.accountPolicy = accountPolicy;
+        this.jwtUtils = jwtUtils;
         this.loginSession = loginSession;
     }
 
@@ -57,7 +62,7 @@ public class AuthService {
 
     private void checkAccountPolicyCorrect(String account){ accountPolicy.validate(account); }
 
-    public User login(String account,String password){
+    public LoginResponse login(String account,String password){
         User user = userRepository.findByAccount(account);
         if(user == null){
             throw new AccountNotFoundException("帳號不存在");
@@ -81,24 +86,21 @@ public class AuthService {
             user.setPasswordHash(newHashedPassword);
         }
 
-        loginSession.login(user);
+        String token = jwtUtils.createToken(user.getUserAccount());
         user.resetFailedLoginAttempts();
         userRepository.save(user);
-        return user;
+        return new LoginResponse(user.getUserName(),token);
     }
 
-    public void logout(){
-        if(!loginSession.isLoggedIn()){
-            throw new InvalidAccountException("尚未登入。");
-        }
-        loginSession.logout();
+    public void logout(String token){
+        if(token == null){ throw new InvalidAccountException("尚未登入。");}
+        token = null;
     }
 
-    public String showCurrentUser(){
-        if(!loginSession.isLoggedIn()){
-            throw new IllegalStateException("尚未登入!");
-        }
-        return loginSession.getCurrentUser().getUserName();
+    public String showCurrentUser(String account){
+        if(account == null){ throw new InvalidAccountException("尚未登入。");}
+        User user = userRepository.findByAccount(account);
+        return user.getUserName();
 
     }
 
@@ -118,7 +120,7 @@ public class AuthService {
 
         User user = loginSession.getCurrentUser();
         String oldPasswordHash = passwordEncoder.encode(oldPassword);
-        if(!oldPasswordHash.equals(user.getPasswordHash())){
+        if(!passwordEncoder.matches(oldPassword,oldPasswordHash)){
             throw new PasswordMismatchException("原始密碼輸入不符!");
         }
 

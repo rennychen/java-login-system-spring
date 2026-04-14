@@ -1,5 +1,5 @@
 jwt:
-  secret: ${JWT_SECRET:mysupersecretkey1234567890123456}
+  secret: ${JWT_SECRET:mysupersecretkey12345678901234567765912}
   expiration: 3600000
   refresh-expiration: 604800000
   header: Authorization

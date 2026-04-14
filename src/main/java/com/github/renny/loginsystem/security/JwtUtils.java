@@ -14,18 +14,18 @@ import java.util.Date;
 public class JwtUtils {
 
     private final Key key;
-    private final long experation;
+    private final long expiration;
 
     public JwtUtils(JwtProperties properties){
         this.key = Keys.hmacShaKeyFor(properties.getSecret().getBytes());
-        this.experation = properties.getEcpiration();
+        this.expiration = properties.getExpiration();
     }
 
     public String createToken(String account){
         return Jwts.builder()
                 .setSubject(account)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + experation))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key)
                 .compact();
     }
@@ -36,5 +36,11 @@ public class JwtUtils {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String getAccountFromToken(String token){
+        Claims claims = parseToken(token);
+        return claims.getSubject();
+
     }
 }

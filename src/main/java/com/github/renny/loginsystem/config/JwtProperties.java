@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class JwtProperties {
 
     private String secret;
-    private long ecpiration;
+    private long expiration;
     private long refreshExpiration;
     private String header;
     private String prefix;
@@ -20,12 +20,12 @@ public class JwtProperties {
         this.secret = secret;
     }
 
-    public long getEcpiration() {
-        return ecpiration;
+    public long getExpiration() {
+        return expiration;
     }
 
-    public void setEcpiration(long ecpiration) {
-        this.ecpiration = ecpiration;
+    public void setExpiration(long expiration) {
+        this.expiration = expiration;
     }
 
     public long getRefreshExpiration() {

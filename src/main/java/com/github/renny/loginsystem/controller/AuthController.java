@@ -7,7 +7,7 @@ import com.github.renny.loginsystem.dto.request.RegisterRequest;
 import com.github.renny.loginsystem.dto.response.ApiResponse;
 import com.github.renny.loginsystem.dto.response.CurrentUserResponse;
 import com.github.renny.loginsystem.dto.response.LoginResponse;
-import com.github.renny.loginsystem.user.User;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,22 +38,23 @@ public class AuthController {
     //登入
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request){
-        User user = authService.login(request.getAccount(),request.getPassword());
-        LoginResponse successData = new LoginResponse(user.getUserName());
-        return ResponseEntity.ok(ApiResponse.success("登入成功,歡迎回來",successData));
+        LoginResponse successData = authService.login(request.getAccount(),request.getPassword());
+        return ResponseEntity.ok(ApiResponse.success("登入成功" ,successData));
     }
 
     //顯示目前登入身分
     @GetMapping("/current")
-    public ResponseEntity<ApiResponse<CurrentUserResponse>> showCurrentUser(){
-        CurrentUserResponse successData = new CurrentUserResponse(authService.showCurrentUser());
+    public ResponseEntity<ApiResponse<CurrentUserResponse>> showCurrentUser(HttpServletRequest request){
+        String account = (String) request.getAttribute("currentUserAccount");
+        CurrentUserResponse successData = new CurrentUserResponse(authService.showCurrentUser(account));
         return ResponseEntity.ok(ApiResponse.success("目前使用者為",successData));
     }
 
     //登出
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(){
-        authService.logout();
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request){
+        String token = (String)request.getAttribute("userToken");
+        authService.logout(token);
         return ResponseEntity.ok(ApiResponse.success("登出成功!",null));
     }
 
