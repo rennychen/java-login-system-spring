@@ -60,15 +60,18 @@ public class AuthController {
 
     //刪除帳號
     @DeleteMapping("/account")
-    public ResponseEntity<ApiResponse<Void>> deleteUserAccount(){
-        authService.deleteUserAccount();
+    public ResponseEntity<ApiResponse<Void>> deleteUserAccount(HttpServletRequest request){
+        String account = (String) request.getAttribute("currentUserAccount");
+        authService.deleteUserAccount(account);
         return ResponseEntity.ok(ApiResponse.success("刪除帳號成功!",null));
     }
 
     //改密碼
     @PatchMapping("/password")
-    public ResponseEntity<ApiResponse<Void>> changePassword(@RequestBody ChangePasswordRequest request){
-        authService.changePassword(request.getOldPassword(),request.getNewPassword(),request.getNewPassword2());
+    public ResponseEntity<ApiResponse<Void>> changePassword(@RequestBody ChangePasswordRequest request,HttpServletRequest httpServletRequest){
+        String account = (String)httpServletRequest.getAttribute("currentUserAccount");
+        String token = (String)httpServletRequest.getAttribute("userToken");
+        authService.changePassword(request.getOldPassword(),request.getNewPassword(),request.getNewPassword2(),account,token);
         return ResponseEntity.ok(ApiResponse.success("更改密碼完成!請用新密碼重新登入",null));
     }
 }

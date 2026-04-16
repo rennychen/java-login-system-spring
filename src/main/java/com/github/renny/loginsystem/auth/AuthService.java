@@ -10,11 +10,11 @@ import com.github.renny.loginsystem.policy.AccountPolicy;
 import com.github.renny.loginsystem.policy.PasswordPolicy;
 import com.github.renny.loginsystem.repository.UserRepository;
 import com.github.renny.loginsystem.security.JwtUtils;
-import com.github.renny.loginsystem.session.LoginSession;
+import com.github.renny.loginsystem.service.TokenBlacklistService;
 import com.github.renny.loginsystem.user.User;
-import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class AuthService {
@@ -24,19 +24,20 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AccountPolicy accountPolicy;
     private final JwtUtils jwtUtils;
-    private final LoginSession loginSession;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository,
                        PasswordPolicy passwordPolicy,
                        @Qualifier("transitioningPasswordEncoderImpl") PasswordEncoder passwordEncoder,
                        AccountPolicy accountPolicy,
-                       JwtUtils jwtUtils,LoginSession loginSession) {
+                       JwtUtils jwtUtils,
+                       TokenBlacklistService tokenBlacklistService) {
         this.userRepository = userRepository;
         this.passwordPolicy = passwordPolicy;
         this.passwordEncoder = passwordEncoder;
         this.accountPolicy = accountPolicy;
         this.jwtUtils = jwtUtils;
-        this.loginSession = loginSession;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     public void register(String account, String userName, String password) {
@@ -94,7 +95,12 @@ public class AuthService {
 
     public void logout(String token){
         if(token == null){ throw new InvalidAccountException("尚未登入。");}
-        token = null;
+        long expiration = jwtUtils.getExpirationFromToken(token);
+        long now = System.currentTimeMillis();
+        long ttl = expiration - now;
+
+        tokenBlacklistService.addToBlacklist(token,ttl);
+
     }
 
     public String showCurrentUser(String account){
@@ -104,21 +110,26 @@ public class AuthService {
 
     }
 
-    public boolean deleteUserAccount(){
-        if(!loginSession.isLoggedIn()){
+    public void deleteUserAccount(String account){
+        if(account == null){
             throw new IllegalStateException("尚未登入!");
         }
+        boolean deleteResult = userRepository.deleteByAccount(account);
 
-        String account = loginSession.getCurrentUser().getUserAccount();
-        boolean result = userRepository.deleteByAccount(account);
-        loginSession.logout();
-        return result;
+        if(!deleteResult){
+            throw new RuntimeException("刪除失敗,找不到該帳號");
+        }
 
     }
 
-    public void changePassword(String oldPassword,String newPassword,String newPassword2){
+    public void changePassword(String oldPassword,String newPassword,String newPassword2,String account,String token){
+        if(account == null) { throw new IllegalStateException("尚未登入"); }
+        long expiration = jwtUtils.getExpirationFromToken(token);
+        long now = System.currentTimeMillis();
+        long ttl = expiration - now;
 
-        User user = loginSession.getCurrentUser();
+        User user = userRepository.findByAccount(account);
+
         String oldPasswordHash = passwordEncoder.encode(oldPassword);
         if(!passwordEncoder.matches(oldPassword,oldPasswordHash)){
             throw new PasswordMismatchException("原始密碼輸入不符!");
@@ -131,8 +142,8 @@ public class AuthService {
         checkPasswordPolicyCorrect(newPassword); //確認密碼設置是否符合規範
         String newPasswordHash = passwordEncoder.encode(newPassword); //密碼改成Hash
         user.setPasswordHash(newPasswordHash);
-        userRepository.save(user);
-        loginSession.logout();
+        tokenBlacklistService.addToBlacklist(token,ttl);
+
 
     }
 }

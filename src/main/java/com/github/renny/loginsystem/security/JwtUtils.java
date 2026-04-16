@@ -41,6 +41,10 @@ public class JwtUtils {
     public String getAccountFromToken(String token){
         Claims claims = parseToken(token);
         return claims.getSubject();
-
+    }
+    
+    public long getExpirationFromToken(String token){
+        Claims claims = parseToken(token);
+        return claims.getExpiration().getTime();
     }
 }

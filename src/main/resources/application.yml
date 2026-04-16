@@ -4,3 +4,11 @@ jwt:
   refresh-expiration: 604800000
   header: Authorization
   prefix: Bearer
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      timeout: 2000ms
