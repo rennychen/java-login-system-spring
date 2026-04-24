@@ -1,8 +1,5 @@
 package com.github.renny.loginsystem.user;
 
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -57,27 +54,22 @@ public class User {
         failedLoginAttempts++;
     }
 
-//    @JsonIgnore
     public boolean isLocked(){
         return failedLoginAttempts >= MAX_FAILED_ATTEMPTS ;
     }
 
-//    @JsonProperty
     private void setUserName(String userName){
         this.userName = userName;
     }
 
-//    @JsonProperty
     private void setUserAccount(String userAccount){
         this.userAccount = userAccount;
     }
-
 
     public int getFailedLoginAttempts(){
         return failedLoginAttempts;
     }
 
-//    @JsonProperty
     private void setFailedLoginAttempts(int failedLoginAttempts){
         this.failedLoginAttempts = failedLoginAttempts;
     }

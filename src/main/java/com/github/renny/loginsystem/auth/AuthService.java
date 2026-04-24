@@ -84,12 +84,6 @@ public class AuthService {
             throw new PasswordMismatchException("密碼錯誤!");
         }
 
-//        BCrypt & SHA256 並存時使用
-//        if(passwordEncoder.upgradeEncoding(user.getPasswordHash())){
-//            String newHashedPassword = passwordEncoder.encode(password);
-//            user.setPasswordHash(newHashedPassword);
-//        }
-
         String token = jwtUtils.createToken(user.getUserAccount());
         user.resetFailedLoginAttempts();
         userRepository.save(user);
@@ -132,7 +126,7 @@ public class AuthService {
         User user = userRepository.findByUserAccount(account);
 
         String oldPasswordHash = passwordEncoder.encode(oldPassword);
-        if(!passwordEncoder.matches(user.getPasswordHash(),oldPasswordHash)){
+        if(!passwordEncoder.matches(oldPasswordHash,user.getPasswordHash())){
             throw new PasswordMismatchException("原始密碼輸入不符!");
         }
 
