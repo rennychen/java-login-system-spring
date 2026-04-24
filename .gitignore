@@ -50,3 +50,6 @@ target/
 
 # env
 .env
+
+# local test files
+TestController.java
