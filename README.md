@@ -1,114 +1,85 @@
 # Java Login System (Spring Boot & REST API)
 
-這是一個基於 Java Spring Boot 開發的後端登入系統。
-
-專案展示了從傳統 Console 應用程式演進至 REST API 架構的過程，並嚴格遵循分層架構設計。
+本專案是一個以 Spring Boot 建構的後端登入驗證系統，模擬實務中常見的帳號認證流程，並採用分層架構設計，具備良好的擴展性與維護性。
 
 
 ## Introduction
 
 本專案模擬實務中常見的帳號登入流程，包含：
+ - 使用者註冊 / 登入 / 修改密碼 / 刪除帳號
+ - BCrypt 密碼雜湊
+ - 登入失敗次數限制與帳號鎖定機制
+ - JWT 無狀態驗證機制
+ - token 驗證機制
+ - Redis 黑名單(實作登出)
 
- - 帳號驗證
- - 密碼加密（Hash）
- - 登入失敗次數限制
- - 帳號鎖定機制
- - Session 管理
 
-本專案著重於：
+## Tech Stack
 
- - 物件導向設計 (OOP) 與 分層架構 (Layered Architecture)
- - Repository & Policy ：實作可抽換的儲存機制與規則驗證
- - REST 轉型：從「純 Java 核心」重構為「Web API 服務」的完整演進
+ - Java 21
+ - Spring Boot
+ - MySQL
+ - Redis
+ - JWT ( JSON Web Token)
+ - Maven
 
 ---
 
 ## Features
 
-- 使用者帳號管理：註冊、登入、刪除帳號、更改密碼。
-- 安全機制：使用 BCrypt 強力雜湊加密，不保存明文密碼。
-- 帳號保護：登入失敗次數累計，超過次數自動鎖定帳號。
-- 全域異常處理：自定義例外（如 AccountLockedException）並統一回傳錯誤訊息。
+- 登入失敗次數限制與帳號鎖定
+- 全域異常處理（Global Exception Handler）
+- 統一 API 回應格式（ApiResponse<T>）
 
 ---
 
- ## Architecture Overview
-
- ```sh
-[ Web Frontend / Postman ]  <-->  [ AuthController (REST API) ]
-                                            ↓
-[ ConsoleRunner (UI Layer) ]  --> [ AuthService (Business Logic) ]
-                                            ↓
-                                  [ UserRepository (Persistence Interface) ]
-                                            ↓
-                                  [ JsonUserRepository / InMemory (Current) ]
+ ## 系統架構
 
  ```
+Controller → Service → Repository → Database
+ ```
+Layer Responsibilities
 
- ### Layer 說明
-
-1️⃣ Controller Layer
+１ Controller Layer
 
  - AuthController: 處理 REST API 請求，回傳 JSON 格式資料。
 
-2️⃣ Service Layer
+２ Service Layer
 
- - AuthService: 負責登入流程控制、驗證邏輯與帳號鎖定判斷。
+ - AuthService: 實作核心商業邏輯（登入流程、驗證、帳號鎖定）
 
-3️⃣ Repository Layer
+３ Repository Layer
 
- - UserRepository (Interface): 定義資料存取行為，實現與具體儲存技術解耦。
-
-4️⃣ Policy & Security
-
- - Policy Pattern: 將密碼與帳號規則抽離為介面，方便未來更換驗證邏輯。
- - PasswordEncoder: 採用 BCrypt 雜湊儲存，確保資料安全性。
+ - UserRepository: 負責資料存取，並透過介面解耦具體實作（MySQL / JSON）
 
 ---
 
 ## Project Structure
 
 ```sh
-com.github.renny.loginsystem  
-├── LoginSystemApplication.java
-├── controller
-│   └── AuthController.java
-├── dto
-│   ├── request
-│   │   ├──ChangePasswordRequest.java
-│   │   ├──LoginRequest.java
-│   │   └──RegisterRequest.java
-│   └── response
-│       ├──ApiResponse.java
-│       ├──CurrentUserResponse.java
-│       └──LoginResponse.java  
-├── user    
-│   └── User.java    
-├── repository    
-│   ├── UserRepository.java
-│   ├── JsonUserRepository.java
-│   └── InMemoryUserRepository.java    
-├── auth    
-│   └── AuthService.java    
-├── policy    
-│   ├── AccountPolicy.java    
-│   ├── DefaultAccountPolicy.java   
-│   ├── PasswordPolicy.java   
-│   └── DefaultPasswordPolicy.java    
-├── session    
-│   └── LoginSession.java   
-├── encoder    
-│   ├── PasswordEncoder.java
-│   ├── BCryptPasswordEncoderImpl.java
-│   ├── TransitioningPasswordEncoder.java
-│   └── SHA256PasswordEncoder.java    
-└── exception    
-    ├── AccountNotFoundException.java    
-    ├── AccountLockedException.java
-    ├── GlobalExcpectionHandler.java
-    ├── InvalidAccountException.java    
-    └── PasswordMismatchException.java    
+
+src/main/java/com/github/renny/loginsystem
+├── controller    # API 層（處理 HTTP 請求）
+├── service       # 商業邏輯（登入流程、驗證）
+├── repository    # 資料存取層（MySQL）
+├── dto           # Request / Response 資料結構
+├── security      # JWT 工具與驗證
+├── interceptor   # Token 攔截驗證
+├── config        # 系統設定（JWT、Web）
+├── exception     # 全域例外處理
+└── policy        # 驗證規則（帳號 / 密碼）
+
 ```
+
+---
+
+## Design Highlights
+
+- 密碼儲存由 SHA-256 升級為 BCrypt，提高安全性
+- 驗證機制由 Session 重構為 JWT，提升系統擴展性
+- 資料儲存由 JSON 遷移至 MySQL，提升可維護性與查詢效率
+- 導入 Redis 作為 Token 黑名單，補強 JWT 無法主動失效的問題
+- 採用分層架構與設計模式，提高系統可維護性
 
 ---
 
@@ -128,28 +99,27 @@ java -jar target/login-system-1.0-SNAPSHOT.jar
 
 ---
 
-## Tech Stack
 
-- Java
-- Spring Boot
-- Maven
-- BCrypt Encoding
-
----
 
  ## Project Evolution
  
-此專案以「逐步演進」的方式進行開發，從純 Java 核心邏輯開始，逐步導入 Spring 架構與資料持久化機制，模擬實務專案的演進過程。
+1. In-Memory
+   → 初始版本，建立核心業務邏輯
 
-1️⃣ 純 Java OOP 版本：建立基礎物件模型。
+2. JSON Persistence
+   → 引入檔案儲存，解決資料持久化問題
 
-2️⃣ Spring Boot DI：版本導入 Spring 框架進行依賴管理。
+3. MySQL Integration（Current）
+   → 重構 Repository 層，導入資料庫
+   → 提升系統擴展性與查詢效率
 
-3️⃣ JSON 持久化版本：實作檔案儲存。
+4. JWT Authentication
+   → 將驗證機制由 Session 改為 Stateless JWT
+   → 提升系統可擴展性
 
-4️⃣ REST API 版本（目前）：新增 Controller，支援 Web Backend 串接。
-
-5️⃣ Database 版本（規劃中）-> 整合資料庫（如 MySQL），實作正式的資料持久化機制。
+5. Redis Token Blacklist
+   → 實作 Logout 機制
+   → 補強 JWT 無法主動失效的問題
 
 
 
