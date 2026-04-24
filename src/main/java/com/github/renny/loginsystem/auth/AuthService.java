@@ -12,6 +12,7 @@ import com.github.renny.loginsystem.repository.UserRepository;
 import com.github.renny.loginsystem.security.JwtUtils;
 import com.github.renny.loginsystem.service.TokenBlacklistService;
 import com.github.renny.loginsystem.user.User;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +27,9 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final TokenBlacklistService tokenBlacklistService;
 
-    public AuthService(@Qualifier("jsonUserRepository") UserRepository userRepository,
+    public AuthService(UserRepository userRepository,
                        PasswordPolicy passwordPolicy,
-                       @Qualifier("transitioningPasswordEncoderImpl") PasswordEncoder passwordEncoder,
+                       @Qualifier("bCryptPasswordEncoderImpl") PasswordEncoder passwordEncoder,
                        AccountPolicy accountPolicy,
                        JwtUtils jwtUtils,
                        TokenBlacklistService tokenBlacklistService) {
@@ -40,6 +41,7 @@ public class AuthService {
         this.tokenBlacklistService = tokenBlacklistService;
     }
 
+    @Transactional
     public void register(String account, String userName, String password) {
         checkAccountNotExists(account); //確認帳號是否存在
         checkAccountPolicyCorrect(account); //確認帳號是否符合設置規範
@@ -52,7 +54,7 @@ public class AuthService {
     }
 
     private void checkAccountNotExists(String account){
-        if(userRepository.existsByAccount(account)){
+        if(userRepository.existsByUserAccount(account)){
             throw new RuntimeException("帳號已存在");
         }
     }
@@ -63,8 +65,9 @@ public class AuthService {
 
     private void checkAccountPolicyCorrect(String account){ accountPolicy.validate(account); }
 
+    @Transactional
     public LoginResponse login(String account,String password){
-        User user = userRepository.findByAccount(account);
+        User user = userRepository.findByUserAccount(account);
         if(user == null){
             throw new AccountNotFoundException("帳號不存在");
         }
@@ -81,11 +84,11 @@ public class AuthService {
             throw new PasswordMismatchException("密碼錯誤!");
         }
 
-
-        if(passwordEncoder.upgradeEncoding(user.getPasswordHash())){
-            String newHashedPassword = passwordEncoder.encode(password);
-            user.setPasswordHash(newHashedPassword);
-        }
+//        BCrypt & SHA256 並存時使用
+//        if(passwordEncoder.upgradeEncoding(user.getPasswordHash())){
+//            String newHashedPassword = passwordEncoder.encode(password);
+//            user.setPasswordHash(newHashedPassword);
+//        }
 
         String token = jwtUtils.createToken(user.getUserAccount());
         user.resetFailedLoginAttempts();
@@ -93,6 +96,7 @@ public class AuthService {
         return new LoginResponse(user.getUserName(),token);
     }
 
+    @Transactional
     public void logout(String token){
         if(token == null){ throw new InvalidAccountException("尚未登入。");}
         long expiration = jwtUtils.getExpirationFromToken(token);
@@ -105,33 +109,30 @@ public class AuthService {
 
     public String showCurrentUser(String account){
         if(account == null){ throw new InvalidAccountException("尚未登入。");}
-        User user = userRepository.findByAccount(account);
+        User user = userRepository.findByUserAccount(account);
         return user.getUserName();
 
     }
 
+    @Transactional
     public void deleteUserAccount(String account){
         if(account == null){
             throw new IllegalStateException("尚未登入!");
         }
-        boolean deleteResult = userRepository.deleteByAccount(account);
-
-        if(!deleteResult){
-            throw new RuntimeException("刪除失敗,找不到該帳號");
-        }
-
+        userRepository.deleteByUserAccount(account);
     }
 
+    @Transactional
     public void changePassword(String oldPassword,String newPassword,String newPassword2,String account,String token){
         if(account == null) { throw new IllegalStateException("尚未登入"); }
         long expiration = jwtUtils.getExpirationFromToken(token);
         long now = System.currentTimeMillis();
         long ttl = expiration - now;
 
-        User user = userRepository.findByAccount(account);
+        User user = userRepository.findByUserAccount(account);
 
         String oldPasswordHash = passwordEncoder.encode(oldPassword);
-        if(!passwordEncoder.matches(oldPassword,oldPasswordHash)){
+        if(!passwordEncoder.matches(user.getPasswordHash(),oldPasswordHash)){
             throw new PasswordMismatchException("原始密碼輸入不符!");
         }
 
@@ -142,8 +143,7 @@ public class AuthService {
         checkPasswordPolicyCorrect(newPassword); //確認密碼設置是否符合規範
         String newPasswordHash = passwordEncoder.encode(newPassword); //密碼改成Hash
         user.setPasswordHash(newPasswordHash);
+        userRepository.save(user);
         tokenBlacklistService.addToBlacklist(token,ttl);
-
-
     }
 }

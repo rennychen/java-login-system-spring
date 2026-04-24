@@ -1,14 +1,17 @@
 package com.github.renny.loginsystem.repository;
 
 import com.github.renny.loginsystem.user.User;
+import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository {
+@Repository
+public interface UserRepository extends JpaRepositoryImplementation<User,Long> {
 
-    User findByAccount(String userAccount); //透過帳號取得User
+    User findByUserAccount(String userAccount); //透過帳號取得User
 
-    boolean existsByAccount(String userAccount); //透過帳號確認User帳號是否存在
+    boolean existsByUserAccount(String userAccount); //透過帳號確認User帳號是否存在
 
-    void save(User user); //儲存User
+//    void save(User user); //儲存User
 
-    boolean deleteByAccount(String userAccount); //透過帳號刪除User
+    void deleteByUserAccount(String userAccount); //透過帳號刪除User
 }
