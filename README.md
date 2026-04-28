@@ -85,9 +85,9 @@ src/main/java/com/github/renny/loginsystem
 
 ## How to Run
 
-直接在 IDE 執行：
+直接在 IDE 執行： LoginSystemApplication.java
 
-LoginSystemApplication.java
+API 測試介面：啟動專案後，造訪 http://localhost:8080/swagger-ui/index.html 即可進行 API 調試。
 
 ## How to Run (Maven)
 
@@ -120,6 +120,13 @@ java -jar target/login-system-1.0-SNAPSHOT.jar
 5. Redis Token Blacklist
    → 實作 Logout 機制
    → 補強 JWT 無法主動失效的問題
+
+---
+
+ ## API Documentation
+本專案整合 Swagger (OpenAPI 3)，提供視覺化 API 調試介面。
+
+![Swagger Screenshot](docs/images/swagger-ui.png)
 
 
 
