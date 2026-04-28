@@ -7,6 +7,7 @@ import com.github.renny.loginsystem.dto.request.RegisterRequest;
 import com.github.renny.loginsystem.dto.response.ApiResponse;
 import com.github.renny.loginsystem.dto.response.CurrentUserResponse;
 import com.github.renny.loginsystem.dto.response.LoginResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag( name = "Auth", description = "帳號動作相關 API" )
 public class AuthController {
 
     private final  AuthService authService;
