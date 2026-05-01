@@ -44,13 +44,11 @@ public class User {
 
 
     public void resetFailedLoginAttempts(){
-        log.info("帳號 {} 登入失敗次數已歸零",this.userAccount);
         failedLoginAttempts = 0;
     }
 
     public void increaseFailedLoginAttempts(){
         failedLoginAttempts++;
-        log.warn("帳號 {} 登入失敗,目前失敗次數 {}",userAccount,failedLoginAttempts);
     }
 
     public boolean isLocked(){

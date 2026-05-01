@@ -71,10 +71,12 @@ public class AuthService {
     public LoginResponse login(String account,String password){
         User user = userRepository.findByUserAccount(account);
         if(user == null){
+            log.warn("登入失敗：找不到帳號 {}", account);
             throw new AccountNotFoundException("帳號不存在");
         }
 
         if(user.isLocked()){
+            log.warn("登入失敗：帳號 {} 處於鎖定狀態，拒絕存取", user.getUserAccount());
             throw new AccountLockedException("登入錯誤超過3次，帳號已鎖定");
         }
 
@@ -83,13 +85,14 @@ public class AuthService {
         if(!passwordMatch){ //登入失敗增加登入失敗次數
             user.increaseFailedLoginAttempts();
             userRepository.save(user);
+            log.warn("帳號 {} 登入失敗,目前失敗次數 {}",user.getUserAccount(),user.getFailedLoginAttempts());
             throw new PasswordMismatchException("密碼錯誤!");
         }
 
         String token = jwtUtils.createToken(user.getUserAccount());
         user.resetFailedLoginAttempts();
         userRepository.save(user);
-        log.info("使用者 {} 登入成功",user.getUserAccount());
+        log.info("使用者 {} 登入成功, 登入失敗次數重置: {} ",user.getUserAccount(),user.getFailedLoginAttempts());
         return new LoginResponse(user.getUserName(),token);
     }
 
@@ -107,7 +110,6 @@ public class AuthService {
     public String showCurrentUser(String account){
         if(account == null){ throw new InvalidAccountException("尚未登入。");}
         User user = userRepository.findByUserAccount(account);
-        log.info("顯示目前使用者帳號 {}",account);
         return user.getUserName();
 
     }

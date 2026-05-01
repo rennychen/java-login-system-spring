@@ -13,19 +13,17 @@ public class GlobalExcpectionHandler {
 
     @ExceptionHandler(AccountLockedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccountLocked(AccountLockedException e){
-        log.warn("發生錯誤,帳號被鎖定 {}",e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("登入失敗," + e.getMessage()));
     }
 
     @ExceptionHandler({AccountNotFoundException.class,InvalidAccountException.class,PasswordMismatchException.class})
     public ResponseEntity<ApiResponse<Void>> handleAuthFail(RuntimeException e){
-        log.warn("發生錯誤,登入失敗 {}",e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("錯誤!" + e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleAll(RuntimeException e){
-        log.warn("發生錯誤 {} ",e.getMessage());
+        log.error("發生錯誤 ",e);
         return ResponseEntity.badRequest().body(ApiResponse.error("錯誤!" + e.getMessage()));
     }
 }
