@@ -3,3 +3,8 @@ jwt:
   expiration: 900000
   refresh-expiration: 3600000
 
+logging:
+  level:
+    com.github.renny.loginsystem: debug
+
+

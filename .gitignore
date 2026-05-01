@@ -53,3 +53,7 @@ target/
 
 # local test files
 TestController.java
+
+#logging
+logs/
+*.log

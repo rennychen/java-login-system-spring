@@ -6,25 +6,35 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-//@JsonIgnoreProperties(ignoreUnknown = true)  //json資料庫使用
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table( name = "users" )
+@Slf4j
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column( nullable = false )
     private String userName;  //使用者名稱
+
     @Column( nullable = false )
+    @Setter
     private String passwordHash;
+
     @Column( nullable = false, unique = true )
     private String userAccount;
+
     @Column(nullable = false)//登入帳號
     private int failedLoginAttempts = 0;  //計算登入錯誤次數
     private static final int MAX_FAILED_ATTEMPTS = 3; //所有使用者登入錯誤上限都是3次,所以使用static final
-
-    public User() {} //無參數建構子
 
     public User(String userName, String passwordHash, String userAccount){
         this.userName = userName;
@@ -32,50 +42,20 @@ public class User {
         this.userAccount = userAccount;
     }
 
-    public String getUserName(){
-        return userName;
-    }
-
-    public void setPasswordHash(String passwordHash){
-        this.passwordHash = passwordHash;
-    }
-
-    public String getPasswordHash(){ return passwordHash; }
-
-    public String getUserAccount(){
-        return userAccount;
-    }
 
     public void resetFailedLoginAttempts(){
+        log.info("帳號 {} 登入失敗次數已歸零",this.userAccount);
         failedLoginAttempts = 0;
     }
 
     public void increaseFailedLoginAttempts(){
         failedLoginAttempts++;
+        log.warn("帳號 {} 登入失敗,目前失敗次數 {}",userAccount,failedLoginAttempts);
     }
 
     public boolean isLocked(){
         return failedLoginAttempts >= MAX_FAILED_ATTEMPTS ;
     }
 
-    private void setUserName(String userName){
-        this.userName = userName;
-    }
-
-    private void setUserAccount(String userAccount){
-        this.userAccount = userAccount;
-    }
-
-    public int getFailedLoginAttempts(){
-        return failedLoginAttempts;
-    }
-
-    private void setFailedLoginAttempts(int failedLoginAttempts){
-        this.failedLoginAttempts = failedLoginAttempts;
-    }
-
-    private Long getId() { return id; }
-
-    private void setId() { this.id = id; }
 }
 

@@ -9,6 +9,7 @@ import com.github.renny.loginsystem.dto.response.CurrentUserResponse;
 import com.github.renny.loginsystem.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,14 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @Tag( name = "Auth", description = "帳號動作相關 API" )
 public class AuthController {
 
-    private final  AuthService authService;
-
-    public AuthController(AuthService authService){
-        this.authService = authService;
-    }
+    private final AuthService authService;
 
     //註冊
     @PostMapping("/register")

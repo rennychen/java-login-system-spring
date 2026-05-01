@@ -13,11 +13,13 @@ import com.github.renny.loginsystem.security.JwtUtils;
 import com.github.renny.loginsystem.service.TokenBlacklistService;
 import com.github.renny.loginsystem.user.User;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -48,7 +50,7 @@ public class AuthService {
         checkPasswordPolicyCorrect(password); //確認密碼設置是否符合規範
         String hashedPassword = passwordEncoder.encode(password); //密碼改成Hash
 
-
+        log.info("用戶 {} 註冊成功",userName);
         User user = new User(userName, hashedPassword, account); //使用者密碼改為hash儲存
         userRepository.save(user);
     }
@@ -87,6 +89,7 @@ public class AuthService {
         String token = jwtUtils.createToken(user.getUserAccount());
         user.resetFailedLoginAttempts();
         userRepository.save(user);
+        log.info("使用者 {} 登入成功",user.getUserAccount());
         return new LoginResponse(user.getUserName(),token);
     }
 
@@ -104,6 +107,7 @@ public class AuthService {
     public String showCurrentUser(String account){
         if(account == null){ throw new InvalidAccountException("尚未登入。");}
         User user = userRepository.findByUserAccount(account);
+        log.info("顯示目前使用者帳號 {}",account);
         return user.getUserName();
 
     }
@@ -125,8 +129,7 @@ public class AuthService {
 
         User user = userRepository.findByUserAccount(account);
 
-        String oldPasswordHash = passwordEncoder.encode(oldPassword);
-        if(!passwordEncoder.matches(oldPasswordHash,user.getPasswordHash())){
+        if(!passwordEncoder.matches(oldPassword,user.getPasswordHash())){
             throw new PasswordMismatchException("原始密碼輸入不符!");
         }
 
