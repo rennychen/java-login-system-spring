@@ -87,7 +87,9 @@ src/main/java/com/github/renny/loginsystem
 
 直接在 IDE 執行： LoginSystemApplication.java
 
-API 測試介面：啟動專案後，造訪 http://localhost:8080/swagger-ui/index.html 即可進行 API 調試。
+API 測試介面：啟動專案後，造訪 http://localhost:8080/swagger-ui/index.html ，提供可互動的 API 文件與測試介面。
+
+點擊右上角 🔒 Authorize -> 輸入 token -> 即可測試需要驗證的 API（如 /auth/current）
 
 ## How to Run (Maven)
 
